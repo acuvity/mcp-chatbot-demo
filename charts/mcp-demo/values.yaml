@@ -42,6 +42,8 @@ mcpServers:
     host:
   - name: mcp-server-memory
     host:
+  - name: mcp-server-microsoft
+    host:
 
 secrets:
   openai_key:
