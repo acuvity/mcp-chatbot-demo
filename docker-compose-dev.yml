@@ -105,6 +105,17 @@ services:
       - memory_data:/data
     restart: always
 
+  mcp-server-microsoft:
+    image: acuvity/mcp-server-microsoft-graph:latest
+    environment:
+      - MINIBRIDGE_LOG_LEVEL=debug
+      - MCP_MICROSOFT_TRANSPORT=sse
+      - MCP_MICROSOFT_SERVICE_NAME=mcp-server-microsoft
+      - MCP_MICROSOFT_TENANT_ID=${MCP_MICROSOFT_TENANT_ID}
+      - MCP_MICROSOFT_CLIENT_ID=${MCP_MICROSOFT_CLIENT_ID}
+      - MCP_MICROSOFT_CLIENT_SECRET=${MCP_MICROSOFT_CLIENT_SECRET}
+    restart: always
+
 volumes:
   postgres_data:
   memory_data:

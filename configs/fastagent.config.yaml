@@ -51,3 +51,8 @@ mcp:
         url: "http://mcp-server-memory:8000/sse"
         read_timeout_seconds: 65534
         read_transport_sse_timeout_seconds: 65534
+    server_microsoft:
+        transport: "sse"
+        url: "http://mcp-server-microsoft:8000/sse"
+        read_timeout_seconds: 65534
+        read_transport_sse_timeout_seconds: 65534
