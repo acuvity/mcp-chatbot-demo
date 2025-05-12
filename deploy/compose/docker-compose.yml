@@ -17,7 +17,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./configs:/config
+      - ../../src/agent/config:/config
     depends_on:
       db:
         condition: service_healthy

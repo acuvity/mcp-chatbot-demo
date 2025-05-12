@@ -10,14 +10,6 @@
   git clone <repository-url>
   ```
 
-- Create a `.env` file based on the provided template:
-
-  ```bash
-  cp .env.template .env
-  ```
-
-- Update the environment variables as needed.
-
 ### Trying out the application with Docker Compose
 
 Follow the instructions [here](./deploy/compose/README.md#trying-out-the-application-with-docker)

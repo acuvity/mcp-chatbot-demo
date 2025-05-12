@@ -49,12 +49,12 @@ containers: mcp-servers-container mcp-demo-container
 	@helm lint charts/$* --values charts/test-values.yaml
 
 .charts-clean:
-	@rm -rf charts/repo
+	@rm -rf deploy/k8s/charts/repo
 
 charts/%: .charts-clean %-chart-lint
-	helm package charts/$* -d ./charts/repo --version $(PACKAGES_VERSION) --app-version $(CONTAINER_TAG)
+	helm package deploy/k8s/charts/$* -d deploy/k8s/charts/repo --version $(PACKAGES_VERSION) --app-version $(CONTAINER_TAG)
 
 .PHONY: charts
-charts: $(filter-out charts/repo%, $(patsubst %/,%, $(filter %/, $(wildcard charts/*/))))
+charts: $(filter-out deploy/k8s/charts/repo%, $(patsubst %/,%, $(filter %/, $(wildcard deploy/k8s/charts/*/))))
 
 push: mcp-servers-container-push mcp-demo-container-push

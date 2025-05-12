@@ -1,5 +1,15 @@
 # Chatbot example with agentic workflows on docker compose
 
+NOTE: All commands here must be run in the deploy/compose directory
+
+- Create a `.env` file based on the provided template:
+
+  ```bash
+  cp .env.template .env
+  ```
+
+- Update the environment variables as needed.
+
 ## Trying out the application with Docker
 
 - Start the Docker containers:
