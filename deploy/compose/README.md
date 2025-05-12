@@ -1,24 +1,6 @@
-# Chatbot example with agentic workflows
+# Chatbot example with agentic workflows on docker compose
 
-## Installation and Setup
-
-### Getting started
-
-- Clone the repository:
-
-  ```bash
-  git clone <repository-url>
-  ```
-
-- Create a `.env` file based on the provided template:
-
-  ```bash
-  cp .env.template .env
-  ```
-
-- Update the environment variables as needed.
-
-### Trying out the application with Docker
+## Trying out the application with Docker
 
 - Start the Docker containers:
 
@@ -35,12 +17,7 @@
   ```
 
 
-### Deploying this in production internally
-
-- Requirements
-  K8s cluster
-
-### Developing ui and agent
+## Developing ui and agent
 
 - Start the Docker containers:
 
@@ -50,15 +27,3 @@
 
   The local filesystem is mounted in the containers and on changing files the `UI` and `Agent` reload.
 
-## API Endpoints
-
-- **GET /health**: Health check endpoint
-- **POST /api/v1/chat**: Send a message to the chat API
-- **GET /api/v1/conversations**: Get all conversations for the current user
-- **GET /api/v1/conversations/{conversation_id}/messages**: Get all messages for a specific conversation
-
-## Running Tests
-
-```bash
-pytest
-```

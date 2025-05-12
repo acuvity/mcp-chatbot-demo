@@ -20,15 +20,15 @@
 
 ### Trying out the application with Docker
 
-Follow the instructions here
+Follow the instructions [here](./deploy/compose/README.md#trying-out-the-application-with-docker)
 
 ### Deploying this on K8s
 
-Follow the instructions here
+Follow the instructions [here](./deploy/k8s/README.md)
 
 ### Developing ui and agent
 
-Follow the instructions here
+Follow the instructions [here](./deploy/compose/README.md#developing-ui-and-agent)
 
 ## API Endpoints
 
