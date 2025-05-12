@@ -25,7 +25,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ../../src/agent/configs:/config
+      - ../../src/agent/config:/config
       - ../../src/agent:/app
     depends_on:
       db:
