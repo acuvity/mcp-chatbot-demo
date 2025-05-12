@@ -22,6 +22,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
+        {{- with .Values.apex.enabled }}
         - name: wait-for-apex
           image: curlimages/curl:latest
           imagePullPolicy: Always
@@ -59,6 +60,7 @@ spec:
                   sleep 1
                 fi
               done
+        {{- end }}
         - name: db-migrations
           image: "acuvity/acuvity-chatbot-agent:latest"
           imagePullPolicy: Always
@@ -145,4 +147,4 @@ spec:
         - name: custom-ca
           configMap:
             name: acuvity-ca-bundle
-            optional: false
+            optional: true
