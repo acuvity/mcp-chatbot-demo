@@ -20,15 +20,35 @@
 
 ### Trying out the application with Docker
 
-Follow the instructions here
+- Start the Docker containers:
 
-### Deploying this on K8s
+  ```bash
+  docker compose up -d
+  ```
 
-Follow the instructions here
+- The `UI` will be available at http://localhost:3000 and the `API` at http://localhost:8000
+
+- Remove all containers and volumes:
+
+  ```bash
+  docker compose down --volumes
+  ```
+
+
+### Deploying this in production internally
+
+- Requirements
+  K8s cluster
 
 ### Developing ui and agent
 
-Follow the instructions here
+- Start the Docker containers:
+
+  ```bash
+  docker compose -f docker-compose-dev.yml up -d
+  ```
+
+  The local filesystem is mounted in the containers and on changing files the `UI` and `Agent` reload.
 
 ## API Endpoints
 
