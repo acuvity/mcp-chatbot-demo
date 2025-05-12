@@ -18,7 +18,7 @@
 
 - Update the environment variables as needed.
 
-### Trying out the application with Docker
+### Trying out the application with Docker Compose
 
 Follow the instructions [here](./deploy/compose/README.md#trying-out-the-application-with-docker)
 
@@ -26,7 +26,7 @@ Follow the instructions [here](./deploy/compose/README.md#trying-out-the-applica
 
 Follow the instructions [here](./deploy/k8s/README.md)
 
-### Developing ui and agent
+### Developing ui and agent (using Docker compose)
 
 Follow the instructions [here](./deploy/compose/README.md#developing-ui-and-agent)
 
