@@ -1,0 +1,258 @@
+# yaml-language-server: $schema=/Users/marcusheese/src/acuvity/backend/pkgs/api/backend/jsonschema/import.json
+
+label: demo-application-mcp-agentic-demo
+
+apps:
+  - name: mcp-agentic-demo
+    description: "An example agentic demo application which uses MCP tools"
+    selector:
+      - - "@k8s:namespace=mcp-demo"
+    subject:
+      - - "@source:namespace=/"
+        - "@source:name=app-tokens"
+        - "@source:type=mtls"
+        - "@apptoken:name=satyam-cluster-2"
+      - - "@source:namespace=/"
+        - "@source:name=app-tokens"
+        - "@source:type=mtls"
+        - "@apptoken:name=marcus-cluster-2"
+    components:
+      - name: ui
+        description: "The UI running a react application."
+        selector:
+          - - "@k8s:label:app=mcp-demo-ui"
+            - "@k8s:label:type=ui"
+            - "@k8s:namespace=mcp-demo"
+        egressMode: Inline
+      - name: agent
+        description: "The agent running the API server."
+        selector:
+          - - "@k8s:label:app=mcp-demo-agent"
+            - "@k8s:label:type=mcp-client"
+            - "@k8s:namespace=mcp-demo"
+        egressMode: Inline
+        providerName: mcp-demo-agent
+        ingressProviderConfigs:
+          - listenPort: 8000
+            mode: Inline
+            listenTLS: Disabled
+            dialTLS: Disabled
+      - name: mcp-brave-search
+        description: "MCP Server: Brave Search"
+        selector:
+          - - "@k8s:label:app.kubernetes.io/name=mcp-server-brave-search"
+            - "@k8s:label:app.kubernetes.io/component=mcp-server"
+            - "@k8s:namespace=mcp-demo"
+        providerName: mcp-demo-mcp-brave-search
+        ingressProviderConfigs:
+          - listenPort: 8000
+            mode: Inline
+            listenTLS: Disabled
+            dialTLS: Disabled
+        egressMode: Inline
+      - name: mcp-fetch
+        description: "MCP Server: Fetch"
+        selector:
+          - - "@k8s:label:app.kubernetes.io/name=mcp-server-fetch"
+            - "@k8s:label:app.kubernetes.io/component=mcp-server"
+            - "@k8s:namespace=mcp-demo"
+        providerName: mcp-demo-mcp-fetch
+        ingressProviderConfigs:
+          - listenPort: 8000
+            mode: Inline
+            listenTLS: Disabled
+            dialTLS: Disabled
+        egressMode: Inline
+      - name: mcp-github
+        description: "MCP Server: GitHub"
+        selector:
+          - - "@k8s:label:app.kubernetes.io/name=mcp-server-github"
+            - "@k8s:label:app.kubernetes.io/component=mcp-server"
+            - "@k8s:namespace=mcp-demo"
+        providerName: mcp-demo-mcp-github
+        ingressProviderConfigs:
+          - listenPort: 8000
+            mode: Inline
+            listenTLS: Disabled
+            dialTLS: Disabled
+        egressMode: Inline
+      - name: mcp-memory
+        description: "MCP Server: Memory"
+        selector:
+          - - "@k8s:label:app.kubernetes.io/name=mcp-server-memory"
+            - "@k8s:label:app.kubernetes.io/component=mcp-server"
+            - "@k8s:namespace=mcp-demo"
+        providerName: mcp-demo-mcp-memory
+        ingressProviderConfigs:
+          - listenPort: 8000
+            mode: Inline
+            listenTLS: Disabled
+            dialTLS: Disabled
+        egressMode: Inline
+      - name: mcp-sequential-thinking
+        description: "MCP Server: Sequential Thinking"
+        selector:
+          - - "@k8s:label:app.kubernetes.io/name=mcp-server-sequential-thinking"
+            - "@k8s:label:app.kubernetes.io/component=mcp-server"
+            - "@k8s:namespace=mcp-demo"
+        providerName: mcp-demo-mcp-sequential-thinking
+        ingressProviderConfigs:
+          - listenPort: 8000
+            mode: Inline
+            listenTLS: Disabled
+            dialTLS: Disabled
+        egressMode: Inline
+      - name: mcp-everything
+        description: "MCP Server: Everything"
+        selector:
+          - - "@k8s:label:app.kubernetes.io/name=mcp-server-everything"
+            - "@k8s:label:app.kubernetes.io/component=mcp-server"
+            - "@k8s:namespace=mcp-demo"
+        providerName: mcp-demo-mcp-everything
+        ingressProviderConfigs:
+          - listenPort: 8000
+            mode: Inline
+            listenTLS: Disabled
+            dialTLS: Disabled
+        egressMode: Inline
+      - name: mcp-microsoft
+        description: "MCP Server: Microsoft"
+        selector:
+          - - "@k8s:label:app.kubernetes.io/name=mcp-server-microsoft"
+            - "@k8s:label:app.kubernetes.io/component=mcp-server"
+            - "@k8s:namespace=mcp-demo"
+        providerName: mcp-demo-mcp-microsoft
+        ingressProviderConfigs:
+          - listenPort: 8000
+            mode: Inline
+            listenTLS: Disabled
+            dialTLS: Disabled
+        egressMode: Inline
+providers:
+  - name: mcp-demo-agent
+    status: Stable
+    friendlyName: MCP Demo - Agent
+    category: App
+    description: "The agent application of the MCP demo"
+    hosts:
+      - name: mcp-demo-agent.mcp-demo.svc.cluster.local
+      - name: mcp-demo-agent.mcp-demo
+      - name: mcp-demo-agent
+    extractors:
+      - def:
+          name: chat/request/message
+          type: Input
+          path: "/api/v1/chat"
+          method: Post
+          script: |-
+            function extract()
+              body = json.decode(input.body())
+              return {
+                annotations = { conversation_id = body.conversation_id },
+                extractions = { content = body.message },
+              }
+            end
+      - def:
+          name: chat/response/message
+          type: Output
+          path: "/api/v1/chat"
+          method: Post
+          script: |-
+            function extract()
+              body = json.decode(input.body())
+              return {
+                annotations = { conversation_id = body.conversation_id },
+                extractions = { content = body.message },
+              }
+            end
+  - name: mcp-demo-mcp-brave-search
+    status: Stable
+    friendlyName: MCP Demo - MCP Server - Brave Search
+    category: App
+    description: "MCP server for Brave Search"
+    analyzeOutput: true
+    hosts:
+      - name: mcp-server-brave-search.mcp-demo.svc.cluster.local
+      - name: mcp-server-brave-search.mcp-demo
+      - name: mcp-server-brave-search
+    extractors:
+      - ref: mcp/input
+      - ref: mcp/output
+  - name: mcp-demo-mcp-fetch
+    status: Stable
+    friendlyName: MCP Demo - MCP Server - Fetch
+    category: App
+    description: "MCP server for Fetch"
+    analyzeOutput: true
+    hosts:
+      - name: mcp-server-fetch.mcp-demo.svc.cluster.local
+      - name: mcp-server-fetch.mcp-demo
+      - name: mcp-server-fetch
+    extractors:
+      - ref: mcp/input
+      - ref: mcp/output
+  - name: mcp-demo-mcp-github
+    status: Stable
+    friendlyName: MCP Demo - MCP Server - GitHub
+    category: App
+    description: "MCP server for GitHub"
+    analyzeOutput: true
+    hosts:
+      - name: mcp-server-github.mcp-demo.svc.cluster.local
+      - name: mcp-server-github.mcp-demo
+      - name: mcp-server-github
+    extractors:
+      - ref: mcp/input
+      - ref: mcp/output
+  - name: mcp-demo-mcp-memory
+    status: Stable
+    friendlyName: MCP Demo - MCP Server - GitHub
+    category: App
+    description: "MCP server for GitHub"
+    analyzeOutput: true
+    hosts:
+      - name: mcp-server-memory.mcp-demo.svc.cluster.local
+      - name: mcp-server-memory.mcp-demo
+      - name: mcp-server-memory
+    extractors:
+      - ref: mcp/input
+      - ref: mcp/output
+  - name: mcp-demo-mcp-sequential-thinking
+    status: Stable
+    friendlyName: MCP Demo - MCP Server - Sequential Thinking
+    category: App
+    description: "MCP server for Sequential Thinking"
+    analyzeOutput: true
+    hosts:
+      - name: mcp-server-sequential-thinking.mcp-demo.svc.cluster.local
+      - name: mcp-server-sequential-thinking.mcp-demo
+      - name: mcp-server-sequential-thinking
+    extractors:
+      - ref: mcp/input
+      - ref: mcp/output
+  - name: mcp-demo-mcp-everything
+    status: Stable
+    friendlyName: MCP Demo - MCP Server - Everything
+    category: App
+    description: "MCP server for Everything"
+    analyzeOutput: true
+    hosts:
+      - name: mcp-server-everything.mcp-demo.svc.cluster.local
+      - name: mcp-server-everything.mcp-demo
+      - name: mcp-server-everything
+    extractors:
+      - ref: mcp/input
+      - ref: mcp/output
+  - name: mcp-demo-mcp-microsoft
+    status: Stable
+    friendlyName: MCP Demo - MCP Server - Microsoft
+    category: App
+    description: "MCP server Miscrosoft"
+    analyzeOutput: true
+    hosts:
+      - name: mcp-server-microsoft.mcp-demo.svc.cluster.local
+      - name: mcp-server-microsoft.mcp-demo
+      - name: mcp-server-microsoft
+    extractors:
+      - ref: mcp/input
+      - ref: mcp/output

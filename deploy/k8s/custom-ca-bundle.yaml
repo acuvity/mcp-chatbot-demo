@@ -1,0 +1,30 @@
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: acuvity-ca-bundle
+spec:
+  sources:
+  - useDefaultCAs: true
+  - inLine: |
+      -----BEGIN CERTIFICATE-----
+      MIIBgTCCASigAwIBAgIQUnVWWkT75MDfySlp5mwS4zAKBggqhkjOPQQDAjAhMR8w
+      HQYDVQQDExZBY3V2aXR5IER5bmFtaWMgVExTIENBMB4XDTI0MDUxNzAwMTIxNFoX
+      DTM0MDMyNjAwMTIxNFowITEfMB0GA1UEAxMWQWN1dml0eSBEeW5hbWljIFRMUyBD
+      QTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABMgYBvZUvGmF19Rs94hycRzDQkyv
+      xtg8B+V6zNtJIgmaQ/mLG6d1o+1JiI/ziTUZC1telEdd/aXR7XmJy2FiE4SjQjBA
+      MA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQcOtHi
+      fcr3FE+4RwQhBsg4WB5G+zAKBggqhkjOPQQDAgNHADBEAiBYTQCUIsrpy3Xoa0rY
+      zuuZnlQMMqnryJPgkhDazno1tQIgH0bmPsz66SJitXCx/s1ed6GjZv/JNpKwcFBb
+      mkFujxg=
+      -----END CERTIFICATE-----
+  target:
+    configMap:
+      key: "ca-bundle.crt"
+    additionalFormats:
+      jks:
+        key: "ca-bundle.crt.jks"
+      pkcs12:
+        key: "ca-bundle.crt.p12"
+    namespaceSelector:
+      matchLabels:
+        acuvity.ai/inject-custom-ca: "enabled"
