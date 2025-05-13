@@ -131,7 +131,7 @@ spec:
           - name: ACCESS_TOKEN_EXPIRE_MINUTES
             value: "10080"
           - name: BACKEND_CORS_ORIGINS
-            value: {{ .Values.agent.corsOrigins }}
+            value: {{ .Values.agent.corsOrigins | quote }}
           - name: ANTHROPIC_API_KEY
             valueFrom:
               secretKeyRef:
