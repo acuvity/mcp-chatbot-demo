@@ -24,13 +24,15 @@ services:
     env_file:
       - .env
     environment:
+      - AGENT_CONFIG_PATH=/config/fastagent.config.yaml
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - AGENTIC_CONFIG_PATH=/config/fastagent.config.yaml
       - DESCOPE_PROJECT_ID=${DESCOPE_PROJECT_ID}
     restart: always
 
   db:
     image: postgres:15-alpine
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
@@ -48,8 +50,10 @@ services:
 
   mcp-server-fetch:
     image: acuvity/mcp-server-fetch:latest
+    env_file:
+      - .env
     environment:
-      - MINIBRIDGE_LOG_LEVEL=debug
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     restart: always
 
   mcp-server-brave-search:
@@ -58,7 +62,7 @@ services:
       - .env
     environment:
       - BRAVE_API_KEY=${BRAVE_API_KEY}
-      - MINIBRIDGE_LOG_LEVEL=debug
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     restart: always
 
   mcp-server-github:
@@ -67,27 +71,33 @@ services:
       - .env
     environment:
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
-      - MINIBRIDGE_LOG_LEVEL=debug
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     restart: always
 
   mcp-server-sequential-thinking:
     image: acuvity/mcp-server-sequential-thinking:latest
+    env_file:
+      - .env
     environment:
-      - MINIBRIDGE_LOG_LEVEL=debug
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     restart: always
 
   mcp-server-memory:
     image: acuvity/mcp-server-memory:latest
-    environment:
-      - MINIBRIDGE_LOG_LEVEL=debug
     volumes:
       - memory_data:/data
+    env_file:
+      - .env
+    environment:
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     restart: always
 
   mcp-server-microsoft:
     image: acuvity/mcp-server-microsoft-graph:latest
+    env_file:
+      - .env
     environment:
-      - MINIBRIDGE_LOG_LEVEL=debug
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
       - MCP_SERVER_MICROSOFT_GRAPH_TRANSPORT=sse
       - MCP_SERVER_MICROSOFT_GRAPH_SERVICE_NAME=mcp-server-microsoft
       - MCP_SERVER_MICROSOFT_GRAPH_TENANT_ID=${MCP_SERVER_MICROSOFT_GRAPH_TENANT_ID}

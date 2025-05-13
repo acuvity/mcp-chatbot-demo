@@ -33,8 +33,8 @@ services:
     env_file:
       - .env
     environment:
+      - AGENT_CONFIG_PATH=/config/fastagent.config.yaml
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - AGENTIC_CONFIG_PATH=/config/fastagent.config.yaml
       - DESCOPE_PROJECT_ID=${DESCOPE_PROJECT_ID}
     restart: always
 
@@ -62,7 +62,7 @@ services:
     ports:
       - "8901:8000"
     environment:
-      - MINIBRIDGE_LOG_LEVEL=debug
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     restart: always
 
   mcp-server-brave-search:
@@ -73,7 +73,7 @@ services:
       - .env
     environment:
       - BRAVE_API_KEY=${BRAVE_API_KEY}
-      - MINIBRIDGE_LOG_LEVEL=debug
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     restart: always
 
   mcp-server-github:
@@ -84,7 +84,7 @@ services:
       - .env
     environment:
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
-      - MINIBRIDGE_LOG_LEVEL=debug
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     restart: always
 
   mcp-server-sequential-thinking:
@@ -92,7 +92,7 @@ services:
     ports:
       - "8904:8000"
     environment:
-      - MINIBRIDGE_LOG_LEVEL=debug
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     restart: always
 
   mcp-server-memory:
@@ -100,7 +100,7 @@ services:
     ports:
       - "8905:8000"
     environment:
-      - MINIBRIDGE_LOG_LEVEL=debug
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     volumes:
       - memory_data:/data
     restart: always
@@ -108,7 +108,7 @@ services:
   mcp-server-microsoft:
     image: acuvity/mcp-server-microsoft-graph:latest
     environment:
-      - MINIBRIDGE_LOG_LEVEL=debug
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
       - MCP_SERVER_MICROSOFT_GRAPH_TRANSPORT=sse
       - MCP_SERVER_MICROSOFT_GRAPH_SERVICE_NAME=mcp-server-microsoft
       - MCP_SERVER_MICROSOFT_GRAPH_TENANT_ID=${MCP_SERVER_MICROSOFT_GRAPH_TENANT_ID}

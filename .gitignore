@@ -23,6 +23,7 @@ wheels/
 .installed.cfg
 *.egg
 otel.jsonl
+test.db
 
 # Virtual Environment
 .env

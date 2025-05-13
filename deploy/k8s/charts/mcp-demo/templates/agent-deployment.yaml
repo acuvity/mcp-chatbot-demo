@@ -137,7 +137,7 @@ spec:
               secretKeyRef:
                 name: {{ .Release.Name }}-secrets
                 key: anthropic_key
-          - name: AGENTIC_CONFIG_PATH
+          - name: AGENT_CONFIG_PATH
             value: "/config/fastagent.config.yaml"
           {{- if .Values.apex.enabled }}
           - name: REQUESTS_CA_BUNDLE # python requests module

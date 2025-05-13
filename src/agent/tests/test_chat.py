@@ -28,6 +28,7 @@ def test_chat_api_new_conversation(client, db):
     # Test chat endpoint
     response = client.post(
         "/api/v1/chat",
+        headers={"Authorization": f"Bearer {user}"},
         json={"message": "Hello, how are you?"}
     )
 
@@ -71,6 +72,7 @@ def test_chat_api_existing_conversation(client, db):
     # Test chat endpoint with existing conversation_id
     response = client.post(
         "/api/v1/chat",
+        headers={"Authorization": f"Bearer {user}"},
         json={
             "message": "Follow-up question",
             "conversation_id": conversation.id

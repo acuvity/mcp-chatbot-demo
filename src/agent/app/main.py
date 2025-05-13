@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 import logging
 
 # OTEL
@@ -22,10 +23,32 @@ def create_tables():
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables created successfully!")
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Run initialization tasks here
+    if settings.ENVIRONMENT == "development":
+        import asyncio
+
+        def init():
+            from app.db.init_db import init_db
+            from app.db.database import SessionLocal
+            create_tables()
+            db = SessionLocal()
+            try:
+                init_db(db)
+            finally:
+                db.close()
+
+        await asyncio.to_thread(init)
+
+    # Yield to allow the app to run
+    yield
+
 # Initialize FastAPI app
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    lifespan=lifespan,
 )
 
 # Initialize OpenTelemetry instrumentation
@@ -42,24 +65,6 @@ app.add_middleware(
 
 # Include API routes
 app.include_router(chat.router, prefix=settings.API_V1_STR)
-
-@app.on_event("startup")
-async def startup_event():
-    """Run initialization tasks when the app starts"""
-    # For development only
-    # In production, use Alembic migrations instead
-    if settings.ENVIRONMENT == "development":
-        # Create database tables on first run
-        create_tables()
-
-        # Create initial admin user if needed
-        from app.db.init_db import init_db
-        from app.db.database import SessionLocal
-        db = SessionLocal()
-        try:
-            init_db(db)
-        finally:
-            db.close()
 
 @app.get("/health")
 def health_check():

@@ -32,14 +32,10 @@ export DOCKER_DEFAULT_PLATFORM CONTAINER_ENGINE
 default: charts containers
 
 mcp-demo-container:
-	@cd src/agent && ${CONTAINER_ENGINE} buildx build --attest type=sbom --attest type=provenance --load -t ${OCI_REGISTRY}/acuvity-chatbot-agent:${CONTAINER_TAG} .
-	@cd src/ui && ${CONTAINER_ENGINE} buildx build --attest type=sbom --attest type=provenance --load -t ${OCI_REGISTRY}/acuvity-chatbot-ui:${CONTAINER_TAG} .
+	@cd src/agent && ${CONTAINER_ENGINE} buildx build --attest type=sbom --attest type=provenance --load --platform linux/arm64/v8,linux/amd64 --tag ${OCI_REGISTRY}/acuvity-chatbot-agent:${CONTAINER_TAG} .
+	@cd src/ui && ${CONTAINER_ENGINE} buildx build --attest type=sbom --attest type=provenance --load --platform linux/arm64/v8,linux/amd64 --tag ${OCI_REGISTRY}/acuvity-chatbot-ui:${CONTAINER_TAG} .
 
 mcp-demo-container-push:
-	@cd src/agent && $(CONTAINER_ENGINE) buildx build --attest type=sbom --attest type=provenance --push --platform linux/amd64 --tag $(OCI_REGISTRY)/acuvity-chatbot-agent:$(CONTAINER_TAG) .
-	@cd src/ui && $(CONTAINER_ENGINE) buildx build --attest type=sbom --attest type=provenance --push --platform linux/amd64 --tag $(OCI_REGISTRY)/acuvity-chatbot-ui:$(CONTAINER_TAG) .
-
-mcp-demo-container-push-multi:
 	@cd src/agent && $(CONTAINER_ENGINE) buildx build --attest type=sbom --attest type=provenance --push --platform linux/arm64/v8,linux/amd64 --tag $(OCI_REGISTRY)/acuvity-chatbot-agent:$(CONTAINER_TAG) .
 	@cd src/ui && $(CONTAINER_ENGINE) buildx build --attest type=sbom --attest type=provenance --push --platform linux/arm64/v8,linux/amd64 --tag $(OCI_REGISTRY)/acuvity-chatbot-ui:$(CONTAINER_TAG) .
 

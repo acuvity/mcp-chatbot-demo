@@ -43,7 +43,7 @@ class AgenticRunner:
         self.input_queue = ContextPropagatingQueue()
         self.output_queue = queue.Queue()
         self.config_path = config_path or os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "fastagent.config.yaml"
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "fastagent.config.yaml"
         )
 
         self.history = True

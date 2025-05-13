@@ -10,17 +10,28 @@
   git clone <repository-url>
   ```
 
-### Trying out the application with Docker Compose
-
-Follow the instructions [here](./deploy/compose/README.md#trying-out-the-application-with-docker)
-
 ### Deploying this on K8s
 
 Follow the instructions [here](./deploy/k8s/README.md)
 
+### Trying out the application with Docker Compose
+
+Follow the instructions [here](./deploy/compose/README.md#trying-out-the-application-with-docker)
+
 ### Developing ui and agent (using Docker compose)
 
 Follow the instructions [here](./deploy/compose/README.md#developing-ui-and-agent)
+
+### Support for TLS
+
+> [!TIP]
+> For ease of use, we are using [tg](https://github.com/acuvity/tg) which is a simple
+> TLS generator CLI: `tg cert --name server --ip 127.0.0.1 --dns localhost`
+
+> [!WARNING]
+> The certificates provided are only for ease of use and MUST not be used in production.
+
+All certificates for MCP servers already exist in certs folder. You can update the `certs/init-certs.sh`
 
 ## API Endpoints
 
