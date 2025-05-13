@@ -131,10 +131,13 @@ spec:
                 key: anthropic_key
           - name: AGENTIC_CONFIG_PATH
             value: "/config/fastagent.config.yaml"
+
+          {{- with .Values.apex.enabled }}
           - name: REQUESTS_CA_BUNDLE # python requests module
             value: /etc/ssl/certs/custom/ca-bundle.crt
           - name: SSL_CERT_FILE # python httpx module
             value: /etc/ssl/certs/custom/ca-bundle.crt
+          {{- end }}
           - name: DESCOPE_PROJECT_ID
             valueFrom:
               secretKeyRef:
@@ -147,4 +150,4 @@ spec:
         - name: custom-ca
           configMap:
             name: acuvity-ca-bundle
-            optional: true
+            optional: {{ not .Values.apex.enabled }}

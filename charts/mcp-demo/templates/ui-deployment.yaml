@@ -79,4 +79,4 @@ spec:
         - name: custom-ca
           configMap:
             name: acuvity-ca-bundle
-            optional: true
+            optional: {{ not .Values.apex.enabled }}
