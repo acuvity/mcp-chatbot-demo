@@ -21,11 +21,11 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.apex.enabled }}
       initContainers:
-        {{- with .Values.apex.enabled }}
         - name: wait-for-apex
-          image: curlimages/curl:latest
-          imagePullPolicy: Always
+          image: "{{ .Values.image.curl.repository }}:{{ .Values.image.curl.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.curl.pullPolicy }}
           command:
             - sh
             - -c
@@ -50,33 +50,38 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "acuvity/acuvity-chatbot-ui:latest"
-          imagePullPolicy: Always
+          image: "{{ .Values.image.ui.repository }}:{{ .Values.image.ui.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.ui.pullPolicy }}
           ports:
             - name: http
-              containerPort: 3000
+              containerPort: {{ .Values.service.ui.port }}
               protocol: TCP
+          {{- if .Values.apex.enabled }}
           volumeMounts:
             - name: custom-ca
               mountPath: "/etc/ssl/certs/custom"
               readOnly: true
+          {{- end }}
           env:
           - name: REACT_APP_API_SERVER_BASE_URL
             value: http://localhost:8000/api/v1/chat
+          {{- if .Values.secrets.descope_project_id }}
           - name: REACT_APP_DESCOPE_PROJECT_ID
             valueFrom:
               secretKeyRef:
                 name: {{ .Release.Name }}-secrets
                 key: descope_project_id
+          {{- end }}
+          {{- if .Values.apex.enabled }}
           - name: REQUESTS_CA_BUNDLE # python requests module
             value: /etc/ssl/certs/custom/ca-bundle.crt
           - name: SSL_CERT_FILE # python httpx module
             value: /etc/ssl/certs/custom/ca-bundle.crt
+          {{- end }}
+      {{- if .Values.apex.enabled }}
       volumes:
-        - name: config
-          secret:
-            secretName: {{ .Release.Name }}-secrets
         - name: custom-ca
           configMap:
             name: acuvity-ca-bundle
-            optional: {{ not .Values.apex.enabled }}
+            optional: false
+      {{- end }}

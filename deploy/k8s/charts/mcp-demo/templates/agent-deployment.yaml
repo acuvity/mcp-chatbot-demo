@@ -22,10 +22,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
-        {{- with .Values.apex.enabled }}
+        {{- if .Values.apex.enabled }}
         - name: wait-for-apex
-          image: curlimages/curl:latest
-          imagePullPolicy: Always
+          image: "{{ .Values.image.curl.repository }}:{{ .Values.image.curl.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.curl.pullPolicy }}
           command:
             - sh
             - -c
@@ -62,8 +62,8 @@ spec:
               done
         {{- end }}
         - name: db-migrations
-          image: "acuvity/acuvity-chatbot-agent:latest"
-          imagePullPolicy: Always
+          image: "{{ .Values.image.agent.repository }}:{{ .Values.image.agent.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.agent.pullPolicy }}
           command:
             - /bin/bash
             - -c
@@ -80,7 +80,10 @@ spec:
           - name: POSTGRES_USER
             value: postgres
           - name: POSTGRES_PASSWORD
-            value: postgres
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-secrets
+                key: postgres_password
           - name: POSTGRES_DB
             value: chat_db
           - name: ENVIRONMENT
@@ -89,41 +92,46 @@ spec:
         - name: agent
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "acuvity/acuvity-chatbot-agent:latest"
-          imagePullPolicy: Always
+          image: "{{ .Values.image.agent.repository }}:{{ .Values.image.agent.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.agent.pullPolicy }}
           command:
             - /bin/bash
             - -c
             - "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.service.agent.port }}
               protocol: TCP
           volumeMounts:
             - name: config
               mountPath: /config/fastagent.config.yaml
               subPath: fastagent.config.yaml
               readOnly: true
+            {{- if .Values.apex.enabled }}
             - name: custom-ca
               mountPath: "/etc/ssl/certs/custom"
               readOnly: true
+            {{- end }}
           env:
           - name: POSTGRES_SERVER
             value: {{ .Release.Name }}-postgres
           - name: POSTGRES_USER
             value: postgres
           - name: POSTGRES_PASSWORD
-            value: postgres
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-secrets
+                key: postgres_password
           - name: POSTGRES_DB
             value: chat_db
           - name: ENVIRONMENT
             value: "development"
           - name: ACCESS_TOKEN_SECURITY_KEY
-            value: "your-secret-key-change-this"
+            value: {{ randAlphaNum 16 | quote}}
           - name: ACCESS_TOKEN_EXPIRE_MINUTES
             value: "10080"
           - name: BACKEND_CORS_ORIGINS
-            value: '["http://localhost:3000","http://localhost:8000"]'
+            value: {{ .Values.agent.corsOrigins }}
           - name: ANTHROPIC_API_KEY
             valueFrom:
               secretKeyRef:
@@ -131,23 +139,26 @@ spec:
                 key: anthropic_key
           - name: AGENTIC_CONFIG_PATH
             value: "/config/fastagent.config.yaml"
-
-          {{- with .Values.apex.enabled }}
+          {{- if .Values.apex.enabled }}
           - name: REQUESTS_CA_BUNDLE # python requests module
             value: /etc/ssl/certs/custom/ca-bundle.crt
           - name: SSL_CERT_FILE # python httpx module
             value: /etc/ssl/certs/custom/ca-bundle.crt
           {{- end }}
+          {{- if .Values.secrets.descope_project_id }}
           - name: DESCOPE_PROJECT_ID
             valueFrom:
               secretKeyRef:
                 name: {{ .Release.Name }}-secrets
                 key: descope_project_id
+          {{- end }}
       volumes:
         - name: config
           secret:
             secretName: {{ .Release.Name }}-secrets
+        {{- if .Values.apex.enabled }}
         - name: custom-ca
           configMap:
             name: acuvity-ca-bundle
-            optional: {{ not .Values.apex.enabled }}
+            optional: false
+        {{- end }}

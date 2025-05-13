@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:15-alpine
-          imagePullPolicy: Always
+          image: "{{ .Values.image.postgres.repository }}:{{ .Values.image.postgres.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.postgres.pullPolicy }}
           ports:
             - name: postgres
               containerPort: 5432
@@ -33,8 +33,11 @@ spec:
               value: {{ .Release.Name }}-postgres
             - name: POSTGRES_USER
               value: postgres
-            - name: POSTGRES_PASSWORD
-              value: postgres
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-secrets
+                key: postgres_password
             - name: POSTGRES_DB
               value: chat_db
       volumes:

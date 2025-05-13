@@ -1,9 +1,22 @@
 replicaCount: 1
 
 image:
-  repository: acuvity/acuvity-demo
-  pullPolicy: Always
-  tag: ""
+  agent:
+    repository: acuvity/acuvity-chatbot-agent
+    pullPolicy: Always
+    tag: latest
+  ui:
+    repository: acuvity/acuvity-chatbot-ui
+    pullPolicy: Always
+    tag: latest
+  postgres:
+    repository: postgres
+    pullPolicy: Always
+    tag: 15-alpine
+  curl:
+    repository: curlimages/curl
+    pullPolicy: Always
+    tag: latest
 
 imagePullSecrets: []
 
@@ -15,8 +28,12 @@ securityContext:
   # runAsUser: 1001
 
 service:
-  type: ClusterIP
-  port: 3000
+  ui:
+    type: ClusterIP
+    port: 3000
+  agent:
+    type: ClusterIP
+    port: 8000
 
 #livenessProbe:
 #  httpGet:
@@ -26,8 +43,6 @@ service:
 #  httpGet:
 #    path: /
 #    port: http
-
-systemPrompt: "You are an AI assistant helping a software engineer..."
 
 # if host is empty then it will use the name as k8s svc host
 # for node port or other pout the host /port instead
@@ -45,8 +60,10 @@ mcpServers:
   - name: mcp-server-microsoft
     host:
 
+agent:
+  corsOrigins: '["http://localhost:3000","http://localhost:8000"]'
+
 secrets:
-  openai_key:
   anthropic_key:
   descope_project_id:
 

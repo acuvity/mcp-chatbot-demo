@@ -6,9 +6,9 @@ metadata:
     app: {{ .Release.Name }}-ui
     type: ui
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.service.ui.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ .Values.service.ui.port }}
       targetPort: 3000
       protocol: TCP
       name: http

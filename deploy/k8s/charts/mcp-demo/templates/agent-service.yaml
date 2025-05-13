@@ -6,9 +6,9 @@ metadata:
     app: {{ .Release.Name }}-agent
     type: mcp-client
 spec:
-  type: ClusterIP
+  type: {{ .Values.service.agent.type }}
   ports:
-    - port: 8000
+    - port: {{ .Values.service.agent.port }}
       targetPort: 8000
       protocol: TCP
       name: http
