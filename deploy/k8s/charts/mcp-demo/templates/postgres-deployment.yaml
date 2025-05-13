@@ -33,11 +33,11 @@ spec:
               value: {{ .Release.Name }}-postgres
             - name: POSTGRES_USER
               value: postgres
-          - name: POSTGRES_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Release.Name }}-secrets
-                key: postgres_password
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: postgres_password
             - name: POSTGRES_DB
               value: chat_db
       volumes:
