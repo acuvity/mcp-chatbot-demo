@@ -31,16 +31,16 @@ mcp:
         url: "https://mcp-server-fetch:8000/sse"
         read_timeout_seconds: 65534
         read_transport_sse_timeout_seconds: 65534
-    server_brave_search:
-        transport: "sse"
-        url: "https://mcp-server-brave-search:8000/sse"
-        read_timeout_seconds: 65534
-        read_transport_sse_timeout_seconds: 65534
-    server_github:
-        transport: "sse"
-        url: "https://mcp-server-github:8000/sse"
-        read_timeout_seconds: 65534
-        read_transport_sse_timeout_seconds: 65534
+    # server_brave_search:
+    #     transport: "sse"
+    #     url: "https://mcp-server-brave-search:8000/sse"
+    #     read_timeout_seconds: 65534
+    #     read_transport_sse_timeout_seconds: 65534
+    # server_github:
+    #     transport: "sse"
+    #     url: "https://mcp-server-github:8000/sse"
+    #     read_timeout_seconds: 65534
+    #     read_transport_sse_timeout_seconds: 65534
     server_sequential_thinking:
         transport: "sse"
         url: "https://mcp-server-sequential-thinking:8000/sse"
@@ -51,8 +51,8 @@ mcp:
         url: "https://mcp-server-memory:8000/sse"
         read_timeout_seconds: 65534
         read_transport_sse_timeout_seconds: 65534
-    server_microsoft:
-        transport: "sse"
-        url: "https://mcp-server-microsoft:8000/sse"
-        read_timeout_seconds: 65534
-        read_transport_sse_timeout_seconds: 65534
+    # server_microsoft:
+    #     transport: "sse"
+    #     url: "https://mcp-server-microsoft:8000/sse"
+    #     read_timeout_seconds: 65534
+    #     read_transport_sse_timeout_seconds: 65534
