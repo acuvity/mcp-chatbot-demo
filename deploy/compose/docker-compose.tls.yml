@@ -24,8 +24,6 @@ services:
       - AGENT_TLS_SERVER_KEY=/certs/mcp-chatbot-agent-key.pem
     restart: always
 
-  db:
-
   mcp-server-fetch:
     env_file:
       - .env
@@ -36,25 +34,25 @@ services:
       - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-fetch-key.pem
     restart: always
 
-  mcp-server-brave-search:
-    volumes:
-      - ../../certs:/certs
-    env_file:
-      - .env
-    environment:
-      - MINIBRIDGE_TLS_SERVER_CERT=/certs/mcp-server-brave-search-cert.pem
-      - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-brave-search-key.pem
-    restart: always
+  # mcp-server-brave-search:
+  #   volumes:
+  #     - ../../certs:/certs
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - MINIBRIDGE_TLS_SERVER_CERT=/certs/mcp-server-brave-search-cert.pem
+  #     - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-brave-search-key.pem
+  #   restart: always
 
-  mcp-server-github:
-    volumes:
-      - ../../certs:/certs
-    env_file:
-      - .env
-    environment:
-      - MINIBRIDGE_TLS_SERVER_CERT=/certs/mcp-server-github-cert.pem
-      - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-github-key.pem
-    restart: always
+  # mcp-server-github:
+  #   volumes:
+  #     - ../../certs:/certs
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - MINIBRIDGE_TLS_SERVER_CERT=/certs/mcp-server-github-cert.pem
+  #     - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-github-key.pem
+  #   restart: always
 
   mcp-server-sequential-thinking:
     volumes:
@@ -76,21 +74,16 @@ services:
       - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-memory-key.pem
     restart: always
 
-  mcp-server-microsoft:
-    volumes:
-      - ../../certs:/certs
-    env_file:
-      - .env
-    environment:
-      - MINIBRIDGE_TLS_SERVER_CERT=/certs/mcp-server-microsoft-cert.pem
-      - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-microsoft-key.pem
-    restart: always
+  # mcp-server-microsoft:
+  #   volumes:
+  #     - ../../certs:/certs
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - MINIBRIDGE_TLS_SERVER_CERT=/certs/mcp-server-microsoft-cert.pem
+  #     - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-microsoft-key.pem
+  #   restart: always
 
 volumes:
   postgres_data:
   memory_data:
-
-
-
-
-
