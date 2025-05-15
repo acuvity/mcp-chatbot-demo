@@ -24,8 +24,6 @@ services:
       - AGENT_TLS_SERVER_KEY=/certs/mcp-chatbot-agent-key.pem
     restart: always
 
-  db:
-
   mcp-server-fetch:
     env_file:
       - .env
