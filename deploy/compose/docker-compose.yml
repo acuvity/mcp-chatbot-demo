@@ -48,6 +48,41 @@ services:
       retries: 5
     restart: always
 
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongodb_data_container:/data/db
+    restart: always
+
+  mongo-express:
+    image: mongo-express:latest
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+
+  mcp-server-mongodb:
+    image: acuvity/mcp-server-mongodb:latest
+    volumes:
+      - mongodb_data_container:/data
+    env_file:
+      - .env
+    environment:
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    restart: always
+
   mcp-server-fetch:
     image: acuvity/mcp-server-fetch:latest
     env_file:
@@ -108,6 +143,7 @@ services:
 volumes:
   postgres_data:
   memory_data:
+  mongodb_data_container:
 
 
 
