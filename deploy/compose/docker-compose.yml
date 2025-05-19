@@ -105,6 +105,29 @@ services:
       - MCP_SERVER_MICROSOFT_GRAPH_CLIENT_SECRET=${MCP_SERVER_MICROSOFT_GRAPH_CLIENT_SECRET}
     restart: always
 
+  mcp-server-mongodb:
+    image: acuvity/mcp-server-mongodb:latest
+    ports:
+      - "9000:8000"
+    env_file:
+      - .env
+    environment:
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
+      - MINIBRIDGE_SBOM=/nothing
+      - MDB_MCP_CONNECTION_STRING=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo/${MONGO_INITDB_DB_NAME}?authSource=admin
+    restart: always
+
+  mcp-server-postgres:
+    image: acuvity/mcp-server-postgres:latest
+    ports:
+      - "9001:8000"
+    env_file:
+      - .env
+    environment:
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
+      - DATABASE_URI=${POSTGRES_URL}
+    restart: always
+
 volumes:
   postgres_data:
   memory_data:

@@ -27,6 +27,7 @@ class Settings(BaseModel):
     POSTGRES_USER: str = os.getenv("POSTGRES_USER", "postgres")
     POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "postgres")
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "chat_db")
+    POSTGRES_PORT: int = int(os.getenv("POSTGRES_PORT", 5432))
     SQLALCHEMY_DATABASE_URI: Optional[str] = None
 
     # LOGGING
@@ -91,7 +92,7 @@ class Settings(BaseModel):
         if os.getenv("SQLALCHEMY_DATABASE_URI"):
             return os.getenv("SQLALCHEMY_DATABASE_URI")
 
-        return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}/{self.POSTGRES_DB}"
+        return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
 # Load settings from environment variables
 settings = Settings()

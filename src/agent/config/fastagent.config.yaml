@@ -56,3 +56,13 @@ mcp:
         url: "http://mcp-server-microsoft:8000/sse"
         read_timeout_seconds: 65534
         read_transport_sse_timeout_seconds: 65534
+    server_mongodb:
+        transport: "sse"
+        url: "http://mcp-server-mongodb:8000/sse"
+        read_timeout_seconds: 65534
+        read_transport_sse_timeout_seconds: 65534
+    server_postgres:
+        transport: "sse"
+        url: "http://mcp-server-postgres:8000/sse"
+        read_timeout_seconds: 65534
+        read_transport_sse_timeout_seconds: 65534
