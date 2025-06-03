@@ -43,6 +43,16 @@ services:
       - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-brave-search-key.pem
     restart: always
 
+  mcp-server-github:
+    volumes:
+      - ../../certs:/certs
+    env_file:
+      - .env
+    environment:
+      - MINIBRIDGE_TLS_SERVER_CERT=/certs/mcp-server-github-cert.pem
+      - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-github-key.pem
+    restart: always
+
   mcp-server-sequential-thinking:
     volumes:
       - ../../certs:/certs
@@ -61,6 +71,16 @@ services:
     environment:
       - MINIBRIDGE_TLS_SERVER_CERT=/certs/mcp-server-memory-cert.pem
       - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-memory-key.pem
+    restart: always
+
+  mcp-server-microsoft:
+    volumes:
+      - ../../certs:/certs
+    env_file:
+      - .env
+    environment:
+      - MINIBRIDGE_TLS_SERVER_CERT=/certs/mcp-server-microsoft-cert.pem
+      - MINIBRIDGE_TLS_SERVER_KEY=/certs/mcp-server-microsoft-key.pem
     restart: always
 
 volumes:

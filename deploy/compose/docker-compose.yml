@@ -67,6 +67,15 @@ services:
       - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     restart: always
 
+  mcp-server-github:
+    image: acuvity/mcp-server-github:latest
+    env_file:
+      - .env
+    environment:
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
+    restart: always
+
   mcp-server-sequential-thinking:
     image: acuvity/mcp-server-sequential-thinking:latest
     env_file:
@@ -83,6 +92,19 @@ services:
       - .env
     environment:
       - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
+    restart: always
+
+  mcp-server-microsoft:
+    image: acuvity/mcp-server-microsoft-graph:latest
+    env_file:
+      - .env
+    environment:
+      - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
+      - MCP_SERVER_MICROSOFT_GRAPH_TRANSPORT=sse
+      - MCP_SERVER_MICROSOFT_GRAPH_SERVICE_NAME=mcp-server-microsoft
+      - MCP_SERVER_MICROSOFT_GRAPH_TENANT_ID=${MCP_SERVER_MICROSOFT_GRAPH_TENANT_ID}
+      - MCP_SERVER_MICROSOFT_GRAPH_CLIENT_ID=${MCP_SERVER_MICROSOFT_GRAPH_CLIENT_ID}
+      - MCP_SERVER_MICROSOFT_GRAPH_CLIENT_SECRET=${MCP_SERVER_MICROSOFT_GRAPH_CLIENT_SECRET}
     restart: always
 
 volumes:
