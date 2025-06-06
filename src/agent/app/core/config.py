@@ -34,7 +34,7 @@ class Settings(BaseModel):
     LOGGING_LEVEL: int = logging.getLevelNamesMapping()[LOGGING_LEVEL_STR]
 
     OTEL_ENABLED: bool = os.getenv("OTEL_ENABLED", False)
-    OTEL_NO_FILE_EXPORT: bool = os.getenv("OTEL_FILE_EXPORT", False)
+    OTEL_NO_FILE_EXPORT: bool = os.getenv("OTEL_NO_FILE_EXPORT", False)
     OTLE_FILE: str = os.getenv("OTLE_FILE", "otel.jsonl")
 
     # CORS
@@ -62,6 +62,7 @@ class Settings(BaseModel):
             from opentelemetry.sdk.resources import SERVICE_NAME, Resource
             from opentelemetry.sdk.trace.export import (
                 ConsoleSpanExporter,
+                BatchSpanProcessor,
                 SimpleSpanProcessor,
             )
             trace.set_tracer_provider(
@@ -74,6 +75,9 @@ class Settings(BaseModel):
                 span_processor = SimpleSpanProcessor(
                     FileSpanExporter(file_path=self.OTLE_FILE)
                 )
+            elif os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "") != "" or os.getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", "") != "":
+                from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+                span_processor = BatchSpanProcessor(OTLPSpanExporter())
             else:
                 span_processor = SimpleSpanProcessor(ConsoleSpanExporter())
             trace.get_tracer_provider().add_span_processor(span_processor)
