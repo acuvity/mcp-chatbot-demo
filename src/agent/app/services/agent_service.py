@@ -15,6 +15,15 @@ class AgentService:
 
     def __init__(self, config: str | None = None) -> None:
         self.config = config or os.environ.get("AGENT_CONFIG_PATH")
+        # Handle YAML configuration if provided
+        yconfig = os.environ.get("AGENT_CONFIG_YAML")
+        if yconfig:
+            import tempfile
+            # Create a temporary file
+            with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp:
+                print(f"Temporary file created at: {temp.name}")
+                temp.write(yconfig)
+                self.config = temp.name
         self.logger = get_logger(__name__)
 
         # Run this service once and process multiple requests
@@ -25,6 +34,13 @@ class AgentService:
             "Acuvity Agent",
             config_path=self.config,
         )
+
+        server_keys = {}
+        try:
+            server_keys = self.fast_agent.config.get("mcp").get("servers").keys()
+        except Exception as e:
+            self.logger.error(f"Error getting server keys: {e}")
+
         @self.fast_agent.agent(
             name="acuvity",
             instruction="""You are an agent with the following:
@@ -36,6 +52,7 @@ class AgentService:
                         - access to memory
                         Your job is to identify the closest match to a user's request,
                         make the appropriate tool calls, and return the information requested by the user.""",
+            servers=server_keys,
             request_params=RequestParams(
                 use_history=True, max_iterations=10000
             ),
