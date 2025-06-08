@@ -9,6 +9,7 @@
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
+            "justMyCode": false,
             "args": [
                 "app.main:app",
                 "--host", "0.0.0.0",

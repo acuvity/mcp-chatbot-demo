@@ -43,8 +43,7 @@ In this mode, the following will happen:
 
 ## Trying a minimal version with few MCP servers
 
-- Modify the [docker compose files](./) and remove the MCP servers you do not want.
-- Modify the [fastagent.config.yml](../../src/agent/config/fastagent.config.yaml) or the [TLS variant](../../src/agent/config/fastagent.tlsconfig.yaml)
+- Modify the [docker compose files](./) and remove the MCP servers you do not want and TLS configurations
 
 ## Developing ui and agent
 
