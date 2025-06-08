@@ -128,7 +128,7 @@ services:
   mcp-server-sequential-thinking:
     image: acuvity/mcp-server-sequential-thinking:latest
     ports:
-      - "8904:8000"
+      - "8903:8000"
     environment:
       - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     restart: always
@@ -136,7 +136,7 @@ services:
   mcp-server-memory:
     image: acuvity/mcp-server-memory:latest
     ports:
-      - "8905:8000"
+      - "8904:8000"
     environment:
       - MINIBRIDGE_LOG_LEVEL=${MCP_SERVER_LOG_LEVEL}
     volumes:
