@@ -1,0 +1,54 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: acuvity-ca-issuer
+  namespace: acuvity
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: acuvity-dynamic-tls-ca
+  namespace: acuvity
+spec:
+  isCA: true
+  duration: 8760h # 1 year - believe it or not, golang does not have 'd' units
+  renewBefore: 720h # 30 days
+  commonName: Acuvity Dynamic TLS CA
+  subject:
+    organizations:
+      - Acuvity
+    organizationalUnits:
+      - DevSecOps
+  secretName: acuvity-dynamic-tls-ca
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: acuvity-ca-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: acuvity-ca-bundle
+spec:
+  sources:
+  - useDefaultCAs: true
+  - secret:
+      name: "acuvity-dynamic-tls-ca"
+      key: "tls.crt"
+  target:
+    configMap:
+      key: "ca-bundle.crt"
+    additionalFormats:
+      jks:
+        key: "ca-bundle.crt.jks"
+      pkcs12:
+        key: "ca-bundle.crt.p12"
+    namespaceSelector:
+      matchLabels:
+        acuvity.ai/inject-custom-ca: "enabled"
