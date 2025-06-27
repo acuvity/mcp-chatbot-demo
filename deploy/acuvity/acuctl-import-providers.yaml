@@ -130,3 +130,16 @@ providers:
     extractors:
       - ref: mcp/input
       - ref: mcp/output
+  - name: mcp-demo-mcp-harness
+    status: Stable
+    friendlyName: MCP Demo - MCP Server - Harness
+    category: App
+    description: "MCP server for Harness"
+    analyzeOutput: true
+    hosts:
+      - name: mcp-server-harness.mcp-demo.svc.cluster.local
+      - name: mcp-server-harness.mcp-demo
+      - name: mcp-server-harness
+    extractors:
+      - ref: mcp/input
+      - ref: mcp/output
