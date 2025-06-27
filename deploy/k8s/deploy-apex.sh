@@ -4,6 +4,29 @@ set -e
 
 cd acuvity
 
+# Use prod values file
+cp apex-agent/apex-agent-values-template.yaml apex-agent/apex-agent-values.yaml
+
+while getopts "at:" opt; do
+  case $opt in
+    a)
+      echo "Using acumux setup..."
+      [ -f $HOME/ca-chain-external.pem ] || { echo "missing CA. copy ca-chain-external.pem to $HOME/ca-chain-external.pem."; exit 1; }
+      MODE="acumux"
+      cp apex-agent/apex-agent-acumux-values.yaml apex-agent/apex-agent-values.yaml
+      ;;
+    t)
+      TOKEN=$OPTARG
+      cp apex-agent/acuvity-apptoken-template.yaml apex-agent/acuvity-apptoken.yaml
+      sed -i "s/YOUR_APP_TOKEN_HERE/$TOKEN/" apex-agent/acuvity-apptoken.yaml
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+  esac
+done
+
 kubectl -n mcp-demo get pods || { echo "no mcp-demo namespace found"; exit 1; }
 
 [ -f apex-agent/acuvity-apptoken.yaml ] || { echo "missing token file."; exit 1; }
@@ -34,15 +57,15 @@ helm upgrade trust-manager jetstack/trust-manager   --install   --namespace cert
 
 kubectl apply -f apex-agent/cert-manager-resources.yaml
 
-if [ -f $HOME/ca-chain-external.pem ]; then
-        echo "----------------------------------------------------"
-        echo "Trust External Certs if needed..."
-        echo "----------------------------------------------------"
+if [ "$MODE" == "acumux" ]; then
+    echo "----------------------------------------------------"
+    echo "Trust External Certs if needed..."
+    echo "----------------------------------------------------"
 	kubectl -n acuvity create configmap ca-cert-config --from-file=$HOME/ca-chain-external.pem
 
 	echo "----------------------------------------------------"
-        echo "Add reachability in k8s to API gateway for Apex..."
-        echo "----------------------------------------------------"
+    echo "Add reachability in k8s to API gateway for Apex..."
+    echo "----------------------------------------------------"
 	kubectl -n acuvity apply -f apex-agent/apex-agent-acumux-svc.yaml
 fi
 

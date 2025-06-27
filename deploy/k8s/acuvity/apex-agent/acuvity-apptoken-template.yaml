@@ -5,4 +5,4 @@ metadata:
   namespace: acuvity
 type: Opaque
 stringData:
-  token: "<YOUR_APP_TOKEN_HERE>"
+  token: "YOUR_APP_TOKEN_HERE"
