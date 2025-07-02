@@ -16,7 +16,7 @@ echo "Installing K3s..."
 curl -sfL https://get.k3s.io | sh -
 sudo k3s kubectl get nodes
 mkdir -p ~/.kube
-sudo cp /etc/rancher/k3s/k3s.yaml /home/${USER}/.kube/config
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${USER}/.kube/kubeconfig.yaml
 sudo chown $(id -u):$(id -g) ~/.kube/kubeconfig.yaml
 echo 'export KUBECONFIG=$HOME/.kube/kubeconfig.yaml' >> ~/.bashrc
 kubectl get nodes
