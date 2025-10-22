@@ -37,4 +37,10 @@ echo "mcpServers:
 
 helm -n mcp-demo install mcp-demo charts/mcp-demo -f values.yaml --set secrets.anthropic_key=$ANTHROPIC_API_KEY
 
+echo "----------------------------------------------------"
+echo "Redeploy Agent..."
+echo "----------------------------------------------------"
+kubectl label namespace mcp-demo acuvity.ai/inject-custom-ca=enabled
+helm -n mcp-demo upgrade mcp-demo charts/mcp-demo --set apex.enabled=true --reuse-values
+
 echo "MCP Servers deployed successfully."

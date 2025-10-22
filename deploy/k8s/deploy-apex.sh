@@ -77,7 +77,7 @@ kubectl apply -f apex-agent/acuvity-apptoken.yaml
 echo "----------------------------------------------------"
 echo "Install Apex..."
 echo "----------------------------------------------------"
-helm upgrade apex  charts/apex-agent-v0.0.0-e85d2014.tgz --install --create-namespace --namespace acuvity -f apex-agent/apex-agent-values.yaml
+helm upgrade apex oci://docker.io/acuvity/apex-agent --version 1.0.0 --install --create-namespace --namespace acuvity -f apex-agent/apex-agent-values.yaml
 
 echo "----------------------------------------------------"
 echo "Redeploy Agent..."
