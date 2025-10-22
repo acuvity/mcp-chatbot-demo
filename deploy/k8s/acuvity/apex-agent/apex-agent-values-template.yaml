@@ -1,6 +1,6 @@
 image:
   repository: acuvity/apex-agent
-  tag: "satyam"
+  tag: "stable"
   pullPolicy: Always
 env:
   - name: APEX_LOG_LEVEL
