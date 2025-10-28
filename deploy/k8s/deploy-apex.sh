@@ -7,13 +7,22 @@ cd acuvity
 # Use prod values file
 cp apex-agent/apex-agent-values-template.yaml apex-agent/apex-agent-values.yaml
 
-while getopts "at:" opt; do
+IMAGE_TAG="stable"
+HELM_TAG="1.0.0"
+
+while getopts "aijt:" opt; do
   case $opt in
     a)
       echo "Using acumux setup..."
-      [ -f $HOME/ca-chain-external.pem ] || { echo "missing CA. copy ca-chain-external.pem to $HOME/ca-chain-external.pem."; exit 1; }
+      [ -f "$HOME/ca-chain-external.pem" ] || { echo "missing CA. copy ca-chain-external.pem to $HOME/ca-chain-external.pem."; exit 1; }
       MODE="acumux"
       cp apex-agent/apex-agent-acumux-values.yaml apex-agent/apex-agent-values.yaml
+      ;;
+    i)
+      IMAGE_TAG="$OPTARG"
+      ;;
+    j)
+      HELM_TAG="$OPTARG"
       ;;
     t)
       TOKEN=$OPTARG
@@ -26,6 +35,9 @@ while getopts "at:" opt; do
       ;;
   esac
 done
+
+# replace the image tag
+sed -i "s/tag: \".*\"/tag: \"$IMAGE_TAG\"/" apex-agent/apex-agent-values.yaml
 
 kubectl -n mcp-demo get pods || { echo "no mcp-demo namespace found"; exit 1; }
 
@@ -61,7 +73,7 @@ if [ "$MODE" == "acumux" ]; then
     echo "----------------------------------------------------"
     echo "Trust External Certs if needed..."
     echo "----------------------------------------------------"
-	kubectl -n acuvity create configmap ca-cert-config --from-file=$HOME/ca-chain-external.pem
+	kubectl -n acuvity create configmap ca-cert-config --from-file="$HOME/ca-chain-external.pem"
 
 	echo "----------------------------------------------------"
     echo "Add reachability in k8s to API gateway for Apex..."
@@ -77,10 +89,4 @@ kubectl apply -f apex-agent/acuvity-apptoken.yaml
 echo "----------------------------------------------------"
 echo "Install Apex..."
 echo "----------------------------------------------------"
-helm upgrade apex oci://docker.io/acuvity/apex-agent --version 1.0.0 --install --create-namespace --namespace acuvity -f apex-agent/apex-agent-values.yaml
-
-echo "----------------------------------------------------"
-echo "Redeploy Agent..."
-echo "----------------------------------------------------"
-kubectl label namespace mcp-demo acuvity.ai/inject-custom-ca=enabled
-helm -n mcp-demo upgrade mcp-demo ../charts/mcp-demo --set apex.enabled=true --reuse-values
+helm upgrade apex oci://docker.io/acuvity/apex-agent --version "$HELM_TAG" --install --create-namespace --namespace acuvity -f apex-agent/apex-agent-values.yaml

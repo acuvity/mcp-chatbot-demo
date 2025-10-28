@@ -17,7 +17,7 @@ metadata:
   name: api-acumux
 subsets:
   - addresses:
-      - ip: 192.168.64.1
+      - ip: 192.168.2.1
     ports:
       - port: 3443
         protocol: TCP
