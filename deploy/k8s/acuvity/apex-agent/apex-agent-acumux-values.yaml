@@ -1,6 +1,6 @@
 image:
   repository: acuvity/apex-agent
-  tag: "satyam"
+  tag: "stable"
   pullPolicy: Always
 env:
   - name: APEX_LOG_LEVEL
@@ -18,7 +18,7 @@ env:
   - name: APEX_API_URL
     value: "https://api-acumux:3443"
   - name: APEX_API_NAMESPACE
-    value: "/orgs/acuvity.ai/apps"
+    value: "/orgs/acuvity.ai/apps/development"
   - name: APEX_JWT_TRUSTED_ISSUER
     value: "https://127.0.0.1:3443"
 apex:
