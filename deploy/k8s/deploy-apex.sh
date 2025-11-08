@@ -10,13 +10,33 @@ cp apex-agent/apex-agent-values-template.yaml apex-agent/apex-agent-values.yaml
 IMAGE_TAG="stable"
 HELM_TAG="1.0.0"
 
-while getopts "aijt:" opt; do
+while getopts "ai:j:t:" opt; do
   case $opt in
     a)
       echo "Using acumux setup..."
-      [ -f "$HOME/ca-chain-external.pem" ] || { echo "missing CA. copy ca-chain-external.pem to $HOME/ca-chain-external.pem."; exit 1; }
+      if [ -z "$ACUVITY_REPO" ] ; then
+        echo "ACUVITY_REPO is not set. Please set it to your Acuvity repository path on your disk."
+        exit 1
+      fi
+
+      # check that the CA certificate is where we would expect it to be
+      [ -f "$ACUVITY_REPO/backend/dev/data/certificates/ca-chain-external.pem" ] || { echo "Missing CA at: $ACUVITY_REPO/backend/dev/data/certificates/ca-chain-external.pem! Are you sure you are running acumux?"; exit 1; }
+
+      # check that the acumux token is where we would expect it to be
+      [ -f "$ACUVITY_REPO/backend/dev/data/apex-agent-apptoken" ] || { echo "Missing acumux app agent token at: $ACUVITY_REPO/backend/dev/data/apex-agent-apptoken! Are you sure you are running acumux?"; exit 1; }
+
       MODE="acumux"
       cp apex-agent/apex-agent-acumux-values.yaml apex-agent/apex-agent-values.yaml
+
+      # TODO: we should actually use the helm chart and the image from the repo, but that will require some more work, and is not what most people will want anyways
+      # switch to the latest development image and helm chart
+      IMAGE_TAG="unstable"
+      HELM_TAG="1.0.0-unstable"
+
+      # use the acumux generated token
+      TOKEN=$(cat "$ACUVITY_REPO/backend/dev/data/apex-agent-apptoken")
+      cp apex-agent/acuvity-apptoken-template.yaml apex-agent/acuvity-apptoken.yaml
+      sed -i.bak "s|YOUR_APP_TOKEN_HERE|$TOKEN|" apex-agent/acuvity-apptoken.yaml && rm -f apex-agent/acuvity-apptoken.yaml.bak
       ;;
     i)
       IMAGE_TAG="$OPTARG"
@@ -27,7 +47,7 @@ while getopts "aijt:" opt; do
     t)
       TOKEN=$OPTARG
       cp apex-agent/acuvity-apptoken-template.yaml apex-agent/acuvity-apptoken.yaml
-      sed -i "s/YOUR_APP_TOKEN_HERE/$TOKEN/" apex-agent/acuvity-apptoken.yaml
+      sed -i.bak "s|YOUR_APP_TOKEN_HERE|$TOKEN|" apex-agent/acuvity-apptoken.yaml && rm -f apex-agent/acuvity-apptoken.yaml.bak
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -37,7 +57,7 @@ while getopts "aijt:" opt; do
 done
 
 # replace the image tag
-sed -i "s/tag: \".*\"/tag: \"$IMAGE_TAG\"/" apex-agent/apex-agent-values.yaml
+sed -i.bak "s|tag: \".*\"|tag: \"$IMAGE_TAG\"|" apex-agent/apex-agent-values.yaml && rm -f apex-agent/apex-agent-values.yaml.bak
 
 kubectl -n mcp-demo get pods || { echo "no mcp-demo namespace found"; exit 1; }
 
@@ -73,7 +93,7 @@ if [ "$MODE" == "acumux" ]; then
     echo "----------------------------------------------------"
     echo "Trust External Certs if needed..."
     echo "----------------------------------------------------"
-	kubectl -n acuvity create configmap ca-cert-config --from-file="$HOME/ca-chain-external.pem"
+	kubectl -n acuvity create configmap ca-cert-config --from-file="$ACUVITY_REPO/backend/dev/data/certificates/ca-chain-external.pem"
 
 	echo "----------------------------------------------------"
     echo "Add reachability in k8s to API gateway for Apex..."
