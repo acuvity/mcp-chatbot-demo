@@ -63,6 +63,9 @@ mcpServers:
 agent:
   corsOrigins: '["http://localhost:3000","http://localhost:8000"]'
 
+ui:
+  apiBaseURL: "http://localhost:8000/api/v1/chat"
+
 secrets:
   anthropic_key:
   descope_project_id:
