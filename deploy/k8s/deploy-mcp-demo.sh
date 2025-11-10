@@ -40,6 +40,6 @@ mcpServers:
     host:
 " > values.yaml
 
-helm -n mcp-demo install mcp-demo charts/mcp-demo -f values.yaml --set secrets.anthropic_key="$ANTHROPIC_API_KEY"
+helm -n mcp-demo install mcp-demo charts/mcp-demo -f values.yaml --set secrets.anthropic_key="$ANTHROPIC_API_KEY" --set secrets.descope_project_id="$DESCOPE_PROJECT_ID"
 
 echo "MCP Chatbot Demo deployed successfully."

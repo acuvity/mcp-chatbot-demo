@@ -39,7 +39,8 @@ spec:
           {{- end }}
           env:
           - name: REACT_APP_API_SERVER_BASE_URL
-            value: http://localhost:8000/api/v1/chat
+            # value: http://localhost:8000/api/v1/chat
+            value: {{ .Values.ui.apiBaseURL | quote }}
           {{- if .Values.secrets.descope_project_id }}
           - name: REACT_APP_DESCOPE_PROJECT_ID
             valueFrom:
