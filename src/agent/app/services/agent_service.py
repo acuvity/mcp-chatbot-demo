@@ -26,6 +26,8 @@ class AgentService:
                 print(f"Temporary file created at: {temp.name}")
                 temp.write(yconfig)
                 self.config = temp.name
+                self.logger.info(f"Configuration file created at: {temp.name}")
+                self.logger.info(f"Configuration content: {yconfig}")
 
         self.running = True
         self.history = True
