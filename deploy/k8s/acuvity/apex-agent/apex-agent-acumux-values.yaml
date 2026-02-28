@@ -1,0 +1,68 @@
+image:
+  repository: acuvity/apex-agent
+  tag: "stable"
+  pullPolicy: Always
+env:
+  - name: APEX_LOG_LEVEL
+    value: debug
+  - name: APEX_LOG_FORMAT
+    value: json
+  - name: APEX_ANALYZER_URL
+    value: ""
+  - name: APEX_AGENT_CA_CERT_INJECTION_PATHS
+    value: ""
+  - name: APEX_DEBUG_INFO_SERVER_LISTEN
+    value: ":12441"
+  - name: APEX_API_CA_CERT
+    value: /certs/ca.pem
+  - name: APEX_API_URL
+    value: "https://api-acumux:3443"
+  - name: APEX_API_NAMESPACE
+    value: "/orgs/acuvity.ai/apps/development"
+  - name: APEX_JWT_TRUSTED_ISSUER
+    value: "https://127.0.0.1:3443"
+apex:
+  disable_dns_monitor: false
+  enable_redirector: true
+  enable_ca_injector: false
+  enable_acutracer: true
+  status_port_listen_addr: ":12442"
+volumes:
+  - name: sysfs
+    hostPath:
+      path: /sys
+      type: Directory
+  - name: run
+    hostPath:
+      path: /run
+      type: DirectoryOrCreate
+  - name: var-run
+    hostPath:
+      path: /var/run
+      type: DirectoryOrCreate
+  - name: crictl-config
+    hostPath:
+      path: /etc/crictl.yaml
+      type: FileOrCreate
+  - name: ca-cert
+    configMap:
+      name: ca-cert-config
+      items:
+        - key: ca-chain-external.pem
+          path: ca.pem
+volumeMounts:
+  - name: sysfs
+    mountPath: /sys
+    mountPropagation: HostToContainer
+  - name: run
+    mountPath: /run
+    mountPropagation: HostToContainer
+  - name: var-run
+    mountPath: /var/run
+    mountPropagation: HostToContainer
+  - name: crictl-config
+    mountPath: /etc/crictl.yaml
+  - name: ca-cert
+    mountPath: /certs/ca.pem
+    subPath: ca.pem
+    readOnly: true

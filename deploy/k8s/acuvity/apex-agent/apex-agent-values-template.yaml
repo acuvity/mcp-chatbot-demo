@@ -1,0 +1,21 @@
+image:
+  repository: acuvity/apex-agent
+  tag: "stable"
+  pullPolicy: Always
+env:
+  - name: APEX_LOG_LEVEL
+    value: debug
+  - name: APEX_LOG_FORMAT
+    value: json
+  - name: APEX_ANALYZER_URL
+    value: ""
+  - name: APEX_AGENT_CA_CERT_INJECTION_PATHS
+    value: ""
+  - name: APEX_DEBUG_INFO_SERVER_LISTEN
+    value: ":12441"
+apex:
+  disable_dns_monitor: false
+  enable_redirector: true
+  enable_ca_injector: false
+  enable_acutracer: true
+  status_port_listen_addr: ":12442"

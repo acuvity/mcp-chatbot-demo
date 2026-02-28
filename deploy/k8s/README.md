@@ -2,29 +2,30 @@
 
 ## Requirements
 
-It is assumed that you have previously completed the following steps:
+* You must have an Anthropic API key set in your environment which is accessible through `$ANTHROPIC_API_KEY`
+* You must have a Brave API key set in your environment which is accessible through `$BRAVE_API_KEY`
 
-* created a Kubernetes namespace for this demo: we are using `mcp-demo` throughout these instructions
-* you have an Anthropic API key set in your environment which is accessible through `$ANTHROPIC_API_KEY`
-* you have installed some [MCP servers](https://mcp.acuvity.ai/); ideally in the same Kubernetes `mcp-demo` namespace
+You can use the script [./deploy-mcp-demo.sh](./deploy-mcp-demo.sh) to deploy the MCP servers and the demo application.
 
-## Installation and Setup
+### Description of things the script does:
 
-Create a `values.yaml` file which describes best all your MCP server setup that you have previously completed.
-If you have installed the MCP servers within the same namespace from the Acuvity MCP registry as where you are planning to install this demo application, then you can match the `name` to its Kubernetes service name and leave the `host` field empty like in this example below as the URL will be automatically completed within the helm chart.
-Otherwise fill out the host to the URL of your MCP server like for example: `http://github.mcp-servers.svc.cluster.local:8000/sse`.
+* Creates a Kubernetes namespace for this demo: we are using `mcp-demo` throughout these instructions
+* Installs a few [MCP servers](https://mcp.acuvity.ai/) in the same Kubernetes `mcp-demo` namespace
+* Create a `values.yaml` file which describes best all your MCP server setup that you have previously completed. If you have installed the MCP servers within the same namespace from the Acuvity MCP registry as where you are planning to install this demo application, then you can match the `name` to its Kubernetes service name and leave the `host` field empty like in this example below as the URL will be automatically completed within the helm chart otherwise fill out the host to the URL of your MCP server like for example: `http://github.mcp-servers.svc.cluster.local:8000/sse`.
 
 ```yaml
 mcpServers:
-  - name: server-github
+  - name: mcp-server-fetch
     host:
-  - name: server-brave-search
+  - name: mcp-server-brave-search
     host:
-  - name: server-memory
+  - name: mcp-server-memory
+    host:
+  - name: mcp-server-sequential-thinking
     host:
 ```
 
-Now install the demo application with the following command:
+* Install the demo application with the command:
 
 ```console
 helm -n mcp-demo install mcp-demo charts/mcp-demo -f values.yaml --set secrets.anthropic_key=$ANTHROPIC_API_KEY

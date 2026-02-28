@@ -21,31 +21,6 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.apex.enabled }}
-      initContainers:
-        - name: wait-for-apex
-          image: "{{ .Values.image.curl.repository }}:{{ .Values.image.curl.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.curl.pullPolicy }}
-          command:
-            - sh
-            - -c
-            - |
-              URL="http://localhost:12442/healthz/egress"
-              while true; do
-                echo "Checking $URL..."
-                if curl --fail-with-body --silent --show-error --max-time 5 "$URL"; then
-                  echo
-                  echo "Apex is healthy for egress!"
-                  echo
-                  break
-                else
-                  echo
-                  echo "Apex is not healthy for egress yet, retrying..."
-                  echo
-                  sleep 1
-                fi
-              done
-      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -64,7 +39,8 @@ spec:
           {{- end }}
           env:
           - name: REACT_APP_API_SERVER_BASE_URL
-            value: http://localhost:8000/api/v1/chat
+            # value: http://localhost:8000/api/v1/chat
+            value: {{ .Values.ui.apiBaseURL | quote }}
           {{- if .Values.secrets.descope_project_id }}
           - name: REACT_APP_DESCOPE_PROJECT_ID
             valueFrom:
