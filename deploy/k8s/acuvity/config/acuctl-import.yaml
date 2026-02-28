@@ -1,132 +1,314 @@
-# yaml-language-server: $schema=/Users/marcusheese/src/acuvity/backend/pkgs/api/backend/jsonschema/import.json
+# yaml-language-server: $schema=../../../pkgs/api/backend/jsonschema/import.json
 
-label: demo-application-mcp-chatbot-demo
+label: apps-v2/mcp-chatbot-demo
 
 apps:
   - name: mcp-chatbot-demo
     description: "An example agentic demo application which uses MCP tools"
-    selector:
-      - - "@k8s:namespace=mcp-demo"
+    namespace: ./apps/development
     subject:
+      - - "@source:namespace=/orgs/acuvity.ai"
       - - "@source:namespace=/"
         - "@source:name=app-tokens"
         - "@source:type=mtls"
-        - "@apptoken:name=satyam-cluster-3"
+        - "@apptoken:name=apex-agent"
     tracing: Recording
     otelReceivers:
       - endpoint: "127.0.0.1:4317"
         protocol: GRPC
       - endpoint: "127.0.0.1:4318"
         protocol: HTTP
+    selector:
+      type: Kubernetes
+      kubernetes:
+        kubernetesNamespace: mcp-demo
     components:
       - name: ui
         description: "The UI running a react application."
+        kind: Other
         selector:
-          - - "@k8s:label:app=mcp-demo-ui"
-            - "@k8s:label:type=ui"
-            - "@k8s:namespace=mcp-demo"
-        egressMode: Inline
+          type: Kubernetes
+          kubernetes:
+            name: mcp-demo-ui
+            kubernetesNamespace: mcp-demo
+            type: Deployment
+        ingress:
+          defaultACLAction: Allow
+          ACLs:
+            - name: allow-all-external
+              IPRanges:
+                - "0.0.0.0/0"
+              port: 3000
+              description: "Allow all external requests"
+              action: Allow
+        egress:
+          defaultPolicy:
+            ACLAction: Allow
       - name: agent
         description: "The agent running the API server."
+        kind: Agent
         selector:
-          - - "@k8s:label:app=mcp-demo-agent"
-            - "@k8s:label:type=mcp-client"
-            - "@k8s:namespace=mcp-demo"
-        egressMode: Inline
-        providerName: mcp-demo-agent
-        ingressProviderConfigs:
-          - listenPort: 8000
-            mode: Inline
-            listenTLS: Disabled
-            dialTLS: Disabled
+          type: Kubernetes
+          kubernetes:
+            name: mcp-demo-agent
+            kubernetesNamespace: mcp-demo
+            type: Deployment
+        ingress:
+          defaultACLAction: Allow
+          ACLs:
+            - name: allow-all-external
+              IPRanges:
+                - "0.0.0.0/0"
+              port: 8000
+              description: "Allow all external requests"
+              action: Allow
+          listeners:
+            - port: 8000
+              mode: Proxy
+              hosts:
+                - localhost
+                - mcp-demo-agent.mcp-demo.svc.cluster.local
+                - mcp-demo-agent.mcp-demo
+                - mcp-demo-agent
+              extractors:
+                - def:
+                    name: chat/request/message
+                    type: Input
+                    path: "/api/v1/chat"
+                    method: Post
+                    script: |-
+                      function extract()
+                        body = json.decode(input.body())
+                        return {
+                          annotations = { conversation_id = body.conversation_id },
+                          extractions = { content = body.message },
+                        }
+                      end
+                - def:
+                    name: chat/response/message
+                    type: Output
+                    path: "/api/v1/chat"
+                    method: Post
+                    script: |-
+                      function extract()
+                        body = json.decode(input.body())
+                        return {
+                          annotations = { conversation_id = body.conversation_id },
+                          extractions = { content = body.message },
+                        }
+                      end
+              proxy:
+                listenTLS: Disabled
+                dialTLS: Disabled
+                defaultPolicyAction: Deny
+                policies:
+                  - name: allow-all-external
+                    description: "Allow all external requests"
+                    rules:
+                      - action: Allow
+                        IPRanges:
+                          - "0.0.0.0/0"
+        egress:
+          defaultPolicy:
+            ACLAction: Allow
+          policies:
+            - name: allow-mcp-tools
+              description: "Allow requests to MCP tools"
+              rules:
+                - mode: Proxy
+                  proxyAction: Allow
+                  appComponents:
+                    - "mcp-chatbot-demo/mcp-brave-search"
+                    - "mcp-chatbot-demo/mcp-fetch"
+                    - "mcp-chatbot-demo/mcp-memory"
+                    - "mcp-chatbot-demo/mcp-sequential-thinking"
+            - name: allow-openai
+              description: "Allow requests to OpenAI API"
+              rules:
+                - mode: Proxy
+                  proxyAction: Allow
+                  providers:
+                  - openai-api
+            - name: allow-anthropic
+              description: "Allow requests to Anthropic API"
+              rules:
+                - mode: Proxy
+                  proxyAction: Allow
+                  providers:
+                  - anthropic-api
+            - name: allow-postgres
+              description: "Allow requests to Postgres database"
+              ACLs:
+                - action: Allow
+                  hostnames:
+                    - "mcp-demo-postgres.mcp-demo.svc.cluster.local"
+      - name: postgres
+        description: "Postgres database for storing chat history."
+        kind: Other
+        selector:
+          type: Kubernetes
+          kubernetes:
+            name: mcp-demo-postgres
+            kubernetesNamespace: mcp-demo
+            type: Deployment
+        ingress:
+          defaultACLAction: Allow
+          ACLs:
+            - name: allow-internal
+              IPRanges:
+                - 10.23.0.0/16
+              port: 5432
+              action: Allow
+        egress:
+          defaultPolicy:
+            ACLAction: Allow
       - name: mcp-brave-search
         description: "MCP Server: Brave Search"
+        kind: Tool
         selector:
-          - - "@k8s:label:app.kubernetes.io/name=mcp-server-brave-search"
-            - "@k8s:label:app.kubernetes.io/component=mcp-server"
-            - "@k8s:namespace=mcp-demo"
-        providerName: mcp-demo-mcp-brave-search
-        ingressProviderConfigs:
-          - listenPort: 8000
-            mode: Inline
-            listenTLS: Disabled
-            dialTLS: Disabled
-        egressMode: Inline
+          type: Kubernetes
+          kubernetes:
+            name: mcp-server-brave-search
+            kubernetesNamespace: mcp-demo
+            type: Deployment
+        ingress:
+          listeners:
+            - port: 8000
+              mode: Proxy
+              hosts:
+                - mcp-server-brave-search.mcp-demo.svc.cluster.local
+                - mcp-server-brave-search.mcp-demo
+                - mcp-server-brave-search
+              extractors:
+                - ref: mcp/input
+                - ref: mcp/output
+              proxy:
+                listenTLS: Disabled
+                dialTLS: Disabled
+                defaultPolicyAction: Deny
+                policies:
+                  - name: allow-agent
+                    description: "Allow requests from the agent"
+                    rules:
+                      - action: Allow
+                        appComponents:
+                          - "mcp-chatbot-demo/agent"
+        egress:
+          defaultPolicy:
+            ACLAction: Allow
+          policies:
+            - name: allow-brave-search
+              description: "Allow requests to Brave Search"
+              ACLs:
+                - action: Allow
+                  hostnames:
+                    - "api.search.brave.com"
       - name: mcp-fetch
         description: "MCP Server: Fetch"
+        kind: Tool
         selector:
-          - - "@k8s:label:app.kubernetes.io/name=mcp-server-fetch"
-            - "@k8s:label:app.kubernetes.io/component=mcp-server"
-            - "@k8s:namespace=mcp-demo"
-        providerName: mcp-demo-mcp-fetch
-        ingressProviderConfigs:
-          - listenPort: 8000
-            mode: Inline
-            listenTLS: Disabled
-            dialTLS: Disabled
-        egressMode: Inline
-      - name: mcp-github
-        description: "MCP Server: GitHub"
-        selector:
-          - - "@k8s:label:app.kubernetes.io/name=mcp-server-github"
-            - "@k8s:label:app.kubernetes.io/component=mcp-server"
-            - "@k8s:namespace=mcp-demo"
-        providerName: mcp-demo-mcp-github
-        ingressProviderConfigs:
-          - listenPort: 8000
-            mode: Inline
-            listenTLS: Disabled
-            dialTLS: Disabled
-        egressMode: Inline
+          type: Kubernetes
+          kubernetes:
+            name: mcp-server-fetch
+            kubernetesNamespace: mcp-demo
+            type: Deployment
+        ingress:
+          listeners:
+            - port: 8000
+              mode: Proxy
+              hosts:
+                - mcp-server-fetch.mcp-demo.svc.cluster.local
+                - mcp-server-fetch.mcp-demo
+                - mcp-server-fetch
+              extractors:
+                - ref: mcp/input
+                - ref: mcp/output
+              proxy:
+                listenTLS: Disabled
+                dialTLS: Disabled
+                defaultPolicyAction: Deny
+                policies:
+                  - name: allow-agent
+                    description: "Allow requests from the agent"
+                    rules:
+                      - action: Allow
+                        appComponents:
+                          - "mcp-chatbot-demo/agent"
+        egress:
+          defaultPolicy:
+            ACLAction: Allow
+          policies:
+            - name: allow-all-internet
+              description: "Allow requests to the internet"
+              ACLs:
+                - action: Allow
+                  IPRanges:
+                    - "0.0.0.0/0"
       - name: mcp-memory
         description: "MCP Server: Memory"
+        kind: Tool
         selector:
-          - - "@k8s:label:app.kubernetes.io/name=mcp-server-memory"
-            - "@k8s:label:app.kubernetes.io/component=mcp-server"
-            - "@k8s:namespace=mcp-demo"
-        providerName: mcp-demo-mcp-memory
-        ingressProviderConfigs:
-          - listenPort: 8000
-            mode: Inline
-            listenTLS: Disabled
-            dialTLS: Disabled
-        egressMode: Inline
+          type: Kubernetes
+          kubernetes:
+            name: mcp-server-memory
+            kubernetesNamespace: mcp-demo
+            type: StatefulSet
+        ingress:
+          listeners:
+            - port: 8000
+              mode: Proxy
+              hosts:
+                - mcp-server-memory.mcp-demo.svc.cluster.local
+                - mcp-server-memory.mcp-demo
+                - mcp-server-memory
+              extractors:
+                - ref: mcp/input
+                - ref: mcp/output
+              proxy:
+                listenTLS: Disabled
+                dialTLS: Disabled
+                defaultPolicyAction: Deny
+                policies:
+                  - name: allow-agent
+                    description: "Allow requests from the agent"
+                    rules:
+                      - action: Allow
+                        appComponents:
+                          - "mcp-chatbot-demo/agent"
+        egress:
+          defaultPolicy:
+            ACLAction: Allow
       - name: mcp-sequential-thinking
         description: "MCP Server: Sequential Thinking"
+        kind: Tool
         selector:
-          - - "@k8s:label:app.kubernetes.io/name=mcp-server-sequential-thinking"
-            - "@k8s:label:app.kubernetes.io/component=mcp-server"
-            - "@k8s:namespace=mcp-demo"
-        providerName: mcp-demo-mcp-sequential-thinking
-        ingressProviderConfigs:
-          - listenPort: 8000
-            mode: Inline
-            listenTLS: Disabled
-            dialTLS: Disabled
-        egressMode: Inline
-      - name: mcp-everything
-        description: "MCP Server: Everything"
-        selector:
-          - - "@k8s:label:app.kubernetes.io/name=mcp-server-everything"
-            - "@k8s:label:app.kubernetes.io/component=mcp-server"
-            - "@k8s:namespace=mcp-demo"
-        providerName: mcp-demo-mcp-everything
-        ingressProviderConfigs:
-          - listenPort: 8000
-            mode: Inline
-            listenTLS: Disabled
-            dialTLS: Disabled
-        egressMode: Inline
-      - name: mcp-microsoft
-        description: "MCP Server: Microsoft"
-        selector:
-          - - "@k8s:label:app.kubernetes.io/name=mcp-server-microsoft"
-            - "@k8s:label:app.kubernetes.io/component=mcp-server"
-            - "@k8s:namespace=mcp-demo"
-        providerName: mcp-demo-mcp-microsoft
-        ingressProviderConfigs:
-          - listenPort: 8000
-            mode: Inline
-            listenTLS: Disabled
-            dialTLS: Disabled
-        egressMode: Inline
+          type: Kubernetes
+          kubernetes:
+            name: mcp-server-sequential-thinking
+            kubernetesNamespace: mcp-demo
+            type: Deployment
+        ingress:
+          listeners:
+            - port: 8000
+              mode: Proxy
+              hosts:
+                - mcp-server-sequential-thinking.mcp-demo.svc.cluster.local
+                - mcp-server-sequential-thinking.mcp-demo
+                - mcp-server-sequential-thinking
+              extractors:
+                - ref: mcp/input
+                - ref: mcp/output
+              proxy:
+                listenTLS: Disabled
+                dialTLS: Disabled
+                defaultPolicyAction: Deny
+                policies:
+                  - name: allow-agent
+                    description: "Allow requests from the agent"
+                    rules:
+                      - action: Allow
+                        appComponents:
+                          - "mcp-chatbot-demo/agent"
+        egress:
+          defaultPolicy:
+            ACLAction: Allow
