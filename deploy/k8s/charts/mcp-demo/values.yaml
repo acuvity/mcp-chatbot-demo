@@ -69,6 +69,3 @@ ui:
 secrets:
   anthropic_key:
   descope_project_id:
-
-apex: 
-  enabled: false

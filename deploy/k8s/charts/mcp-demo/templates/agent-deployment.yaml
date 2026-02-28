@@ -22,45 +22,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
-        {{- if .Values.apex.enabled }}
-        - name: wait-for-apex
-          image: "{{ .Values.image.curl.repository }}:{{ .Values.image.curl.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.curl.pullPolicy }}
-          command:
-            - sh
-            - -c
-            - |
-              URL="http://localhost:12442/healthz/egress"
-              while true; do
-                echo "Checking $URL..."
-                if curl --fail-with-body --silent --show-error --max-time 5 "$URL"; then
-                  echo
-                  echo "Apex is healthy for egress!"
-                  echo
-                  break
-                else
-                  echo
-                  echo "Apex is not healthy for egress yet, retrying..."
-                  echo
-                  sleep 1
-                fi
-              done
-              URL="http://localhost:12442/healthz/ingress"
-              while true; do
-                echo "Checking $URL..."
-                if curl --fail-with-body --silent --show-error --max-time 5 "$URL"; then
-                  echo
-                  echo "Apex is healthy for ingress!"
-                  echo
-                  break
-                else
-                  echo
-                  echo "Apex is not healthy for ingress yet, retrying..."
-                  echo
-                  sleep 1
-                fi
-              done
-        {{- end }}
         - name: db-migrations
           image: "{{ .Values.image.agent.repository }}:{{ .Values.image.agent.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.agent.pullPolicy }}
@@ -107,11 +68,9 @@ spec:
               mountPath: /config/fastagent.config.yaml
               subPath: fastagent.config.yaml
               readOnly: true
-            {{- if .Values.apex.enabled }}
             - name: custom-ca
               mountPath: "/etc/ssl/certs/custom"
               readOnly: true
-            {{- end }}
           env:
           - name: POSTGRES_SERVER
             value: {{ .Release.Name }}-postgres
@@ -139,7 +98,7 @@ spec:
                 key: anthropic_key
           - name: AGENT_CONFIG_PATH
             value: "/config/fastagent.config.yaml"
-          {{- if .Values.apex.enabled }}
+          # OpenTelemetry environment variables to report to Acuvity Apex Agent
           - name: OTEL_ENABLED
             value: "true"
           - name: OTEL_NO_FILE_EXPORT
@@ -156,7 +115,6 @@ spec:
             value: /etc/ssl/certs/custom/ca-bundle.crt
           - name: SSL_CERT_FILE # python httpx module
             value: /etc/ssl/certs/custom/ca-bundle.crt
-          {{- end }}
           {{- if .Values.secrets.descope_project_id }}
           - name: DESCOPE_PROJECT_ID
             valueFrom:
@@ -168,9 +126,7 @@ spec:
         - name: config
           secret:
             secretName: {{ .Release.Name }}-secrets
-        {{- if .Values.apex.enabled }}
         - name: custom-ca
           configMap:
             name: acuvity-ca-bundle
             optional: false
-        {{- end }}

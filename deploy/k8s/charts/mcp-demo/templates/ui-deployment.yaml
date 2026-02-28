@@ -31,12 +31,10 @@ spec:
             - name: http
               containerPort: {{ .Values.service.ui.port }}
               protocol: TCP
-          {{- if .Values.apex.enabled }}
           volumeMounts:
             - name: custom-ca
               mountPath: "/etc/ssl/certs/custom"
               readOnly: true
-          {{- end }}
           env:
           - name: REACT_APP_API_SERVER_BASE_URL
             # value: http://localhost:8000/api/v1/chat
@@ -48,16 +46,12 @@ spec:
                 name: {{ .Release.Name }}-secrets
                 key: descope_project_id
           {{- end }}
-          {{- if .Values.apex.enabled }}
           - name: REQUESTS_CA_BUNDLE # python requests module
             value: /etc/ssl/certs/custom/ca-bundle.crt
           - name: SSL_CERT_FILE # python httpx module
             value: /etc/ssl/certs/custom/ca-bundle.crt
-          {{- end }}
-      {{- if .Values.apex.enabled }}
       volumes:
         - name: custom-ca
           configMap:
             name: acuvity-ca-bundle
             optional: false
-      {{- end }}

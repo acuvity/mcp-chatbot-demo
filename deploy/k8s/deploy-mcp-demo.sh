@@ -27,9 +27,7 @@ helm -n mcp-demo install mcp-server-sequential-thinking oci://docker.io/acuvity/
 echo "MCP Servers deployed successfully."
 
 echo "Creating values.yaml for MCP Servers to be used by chatbot..."
-echo "apex:
-  enabled: true
-mcpServers:
+echo "mcpServers:
   - name: mcp-server-fetch
     host:
   - name: mcp-server-brave-search

@@ -4,7 +4,7 @@ image:
   pullPolicy: Always
 env:
   - name: APEX_LOG_LEVEL
-    value: debug
+    value: info
   - name: APEX_LOG_FORMAT
     value: json
   - name: APEX_ANALYZER_URL
